@@ -8,6 +8,22 @@ function calculate() {
 
   const totalExpenses = rent + food + transport + other;
   const savings = income - totalExpenses;
-  const savingsPercentage = (savings / income) * 100; 
+  const savingsPercentage = (savings / income) * 100;
+  
+  let message = "";
+
+  if (savings < 0) {
+    message = "You are overspending.";
+  } else if (savingsPercentage >= 20) {
+    message = "Healthy saving.";
+  } else {
+    message = "Moderate saving.";
+  }
+
+  document.getElementById("result").innerText =
+    "Total Expenses: $" + totalExpenses +
+    "\nSavings: $" + savings +
+    "\nSavings %: " + savingsPercentage.toFixed(2) + "%" +
+    "\nAdvice: " + message;
 
 }
