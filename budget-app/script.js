@@ -6,6 +6,8 @@ function calculate() {
   const transport = Number(document.getElementById("transport").value);
   const other = Number(document.getElementById("other").value);
 
-  console.log(income, rent, food, transport, other);  
+  const totalExpenses = rent + food + transport + other;
+  const savings = income - totalExpenses;
+  const savingsPercentage = (savings / income) * 100; 
 
 }
