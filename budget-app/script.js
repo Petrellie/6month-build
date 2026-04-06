@@ -12,7 +12,7 @@ function calculate() {
   //const savingsPercentage = (savings / income) * 100;
   let savingsPercentage = 0;
   if (income > 0) {
-    savingsPercentage = (savings / income) *
+    savingsPercentage = (savings / income) * 100
   }
   
   let message = "";
