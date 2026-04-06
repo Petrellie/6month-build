@@ -8,7 +8,12 @@ function calculate() {
 
   const totalExpenses = rent + food + transport + other;
   const savings = income - totalExpenses;
-  const savingsPercentage = (savings / income) * 100;
+  
+  //const savingsPercentage = (savings / income) * 100;
+  let savingsPercentage = 0;
+  if (income > 0) {
+    savingsPercentage = (savings / income) *
+  }
   
   let message = "";
 
@@ -20,10 +25,17 @@ function calculate() {
     message = "Moderate saving.";
   }
 
-  document.getElementById("result").innerText =
-    "Total Expenses: $" + totalExpenses +
-    "\nSavings: $" + savings +
-    "\nSavings %: " + savingsPercentage.toFixed(2) + "%" +
-    "\nAdvice: " + message;
+  //document.getElementById("result").innerText =
+    //"Total Expenses: $" + totalExpenses +
+    //"\nSavings: $" + savings +
+    //"\nSavings %: " + savingsPercentage.toFixed(2) + "%" +
+    //"\nAdvice: " + message;
+  document.getElementById("result").innerHTML =
+  `
+  <strong>Total Expenses:</strong> $${totalExpenses}<br>
+  <strong>Savings:</strong> $${savings}<br>
+  <strong>Savings %:</strong> ${savingsPercentage.toFixed(2)}%<br>
+  <strong>Advice:</strong> ${message}
+  `;
 
 }
