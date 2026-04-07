@@ -11,6 +11,10 @@ let state = {
   advice: ""
 };
 
+function getInputValue(id) {
+   return Number(document.getElementById(id).value) || 0;
+}
+
 function updateState() {
   state.income = getInputValue("income");
   state.rent = getInputValue("rent");
