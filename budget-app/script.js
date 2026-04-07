@@ -34,9 +34,9 @@ function getInputValue(id) {
   return Number(document.getElementById(id).value) || 0;
 }
 
-function calculateSavings(income, expenses) {
-  return income - expenses;
-}
+// function calculateSavings(income, expenses) {
+//   return income - expenses;
+// }
 
 function calculatePercentage(savings, income) {
   if (income <= 0) return 0;
