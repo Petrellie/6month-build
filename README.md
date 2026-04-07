@@ -1,14 +1,31 @@
 # 6month-build
 
+## Budget Calculator (Vanilla JS)
+
+### Date
 06/04/2026
-1. setup github
-2. Tried Codespaces
-3. Ran a server ( but i am not sure how to do it, GPT taught me)
-   {
-    i) in TERMINAL tab type: cd budget-app ( i think it moves deeper into workspaces)
+
+### What I Implemented
+- GitHub repository setup
+- Cloud development via Codespaces
+- Local server using `npx serve`
+    <!-- i) in TERMINAL tab type: cd budget-app
     ii) next type: npx serve
     iii) press "y" to install packages
-    iv) a link is provided in PORTS tab
-   }
-4. Learned Abstraction; modular function ( good practice for scalability)
-5. Defense Programming: Users will always tried their best to break things
+    iv) a link is provided in PORTS tab -->
+- Modular JavaScript structure
+- Input validation layer
+- Defensive programming (division-by-zero handling)
+- Event listener pattern (removed inline onclick)
+
+### Concepts Practiced
+- Abstraction (DRY principle)
+- Separation of concerns
+- Defensive programming
+- DOM manipulation
+- Basic state computation
+
+### Next Improvements
+- Input-level validation
+- Dynamic UI feedback
+- Refactor into state-driven architecture
