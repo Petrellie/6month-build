@@ -87,6 +87,16 @@ function updateState() {
   state.transport = getInputValue("transport");
   state.other = getInputValue("other");
 
+  const errorMessage = validateInputs(income, rent, food, transport, other);
+
+   if (errorMessage) {
+     document.getElementById("error").innerText = errorMessage;
+     document.getElementById("result").innerHTML = "";
+     return;
+   }
+
+   document.getElementById("error").innerText = "";
+
   state.totalExpenses =
     state.rent + state.food + state.transport + state.other;
 
