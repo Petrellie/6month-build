@@ -1,14 +1,17 @@
-
 let state = {
-  income: 0,
-  rent: 0,
-  food: 0,
-  transport: 0,
-  other: 0,
-  totalExpenses: 0,
-  savings: 0,
-  percentage: 0,
-  advice: ""
+  inputs: {
+    income: 0,
+    rent: 0,
+    food: 0,
+    transport: 0,
+    other: 0
+  },
+  derived: {
+    totalExpenses: 0,
+    savings: 0,
+    percentage: 0,
+    advice: ""
+  }
 };
 
 // document
@@ -81,47 +84,44 @@ function getAdvice(savings, percentage) {
 // }
 
 function updateState() {
-  state.income = getInputValue("income");
-  state.rent = getInputValue("rent");
-  state.food = getInputValue("food");
-  state.transport = getInputValue("transport");
-  state.other = getInputValue("other");
+  state.inputs.income = getInputValue("income");
+  state.inputs.rent = getInputValue("rent");
+  state.inputs.food = getInputValue("food");
+  state.inputs.transport = getInputValue("transport");
+  state.inputs.other = getInputValue("other");
 
-  const errorMessage = validateInputs(income, rent, food, transport, other);
+  const totalExpenses =
+    state.inputs.rent +
+    state.inputs.food +
+    state.inputs.transport +
+    state.inputs.other;
 
-   if (errorMessage) {
-     document.getElementById("error").innerText = errorMessage;
-     document.getElementById("result").innerHTML = "";
-     return;
-   }
-
-   document.getElementById("error").innerText = "";
-
-  state.totalExpenses =
-    state.rent + state.food + state.transport + state.other;
-
-  state.savings = calculateSavings(
-    state.income,
-    state.totalExpenses
+  const savings = calculateSavings(
+    state.inputs.income,
+    totalExpenses
   );
 
-  state.percentage = calculatePercentage(
-    state.savings,
-    state.income
+  const percentage = calculatePercentage(
+    savings,
+    state.inputs.income
   );
+  
+  const advice = getAdvice(savings, percentage);
 
-  state.advice = getAdvice(
-    state.savings,
-    state.percentage
-  );
+  state.derived.totalExpenses = totalExpenses;
+  state.derived.savings = savings;
+  state.derived.percentage = percentage;
+  state.derived.advice = advice;
 }
 
 function renderResult() {
+  const d = state.derived;
+
   document.getElementById("result").innerHTML = `
-    <strong>Total Expenses:</strong> $${state.totalExpenses}<br>
-    <strong>Savings:</strong> $${state.savings}<br>
-    <strong>Savings %:</strong> ${state.percentage.toFixed(2)}%<br>
-    <strong>Advice:</strong> ${state.advice}
+    <strong>Total Expenses:</strong> $${d.totalExpenses}<br>
+    <strong>Savings:</strong> $${d.savings}<br>
+    <strong>Savings %:</strong> ${d.percentage.toFixed(2)}%<br>
+    <strong>Advice:</strong> ${d.advice}
   `;
 }
 
