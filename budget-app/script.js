@@ -38,7 +38,7 @@ function validateInputs(inputs) {
 
   if (inputs.income === 0) {
     errors.income = "Income cannot be zero.";
-  } else if (inputs.icoome < 0) {
+  } else if (inputs.income < 0) {
     errors.income = "Income cannot be negative.";
   }
 
