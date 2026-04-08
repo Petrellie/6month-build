@@ -38,6 +38,8 @@ function validateInputs(inputs) {
 
   if (inputs.income === 0) {
     errors.income = "Income cannot be zero.";
+  } else if (inputs.icoome < 0) {
+    errors.income = "Income cannot be negative.";
   }
 
   Object.entries(inputs).forEach(([key, value]) => {
