@@ -43,8 +43,8 @@ function validateInputs(inputs) {
   }
 
   Object.entries(inputs).forEach(([key, value]) => {
-    if (value < 0) {
-      errors[key] = "Value cannot be negative.";
+    if (value < 0 && key !== "income") {
+      errors[key] = `${key.charAt(0).toUpperCase() + key.slice(1)} cannot be negative.`;
     }
   });
 
