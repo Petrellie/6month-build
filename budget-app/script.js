@@ -1,137 +1,119 @@
-let state = {
+const state = {
   inputs: {
     income: 0,
     rent: 0,
     food: 0,
     transport: 0,
-    other: 0
+    other: 0,
   },
   derived: {
     totalExpenses: 0,
     savings: 0,
     percentage: 0,
-    advice: ""
-  }
+    advice: "",
+  },
+  ui: {
+    loading: false,
+    error: null,
+    validationErrors: {},
+  },
 };
 
-// document
-//   .getElementById("calculateBtn")
-//   .addEventListener("click", calculate);
-
-function validateInputs(income, rent, food, transport, other) {
-  if (income <= 0) {
-    return "Income must be greater than 0.";
-  }
-
-  if (rent < 0 || food < 0 || transport < 0 || other < 0) {
-    return "Expenses cannot be negative.";
-  }
-
-  return null;
-}
-
 function getInputValue(id) {
-  return Number(document.getElementById(id).value) || 0;
+  const value = parseFloat(document.getElementById(id).value);
+  return isNaN(value) ? 0 : value;
 }
 
-function calculateSavings(income, expenses) {
-  return income - expenses;
-}
-
-function calculatePercentage(savings, income) {
-  if (income <= 0) return 0;
-  return (savings / income) * 100;
-}
-
-function getAdvice(savings, percentage) {
-  if (savings < 0) return "You are overspending.";
-  if (percentage >= 20) return "Healthy saving.";
-  return "Moderate saving.";
-}
-
-// function renderResult(totalExpenses, savings, percentage, message) {
-//   document.getElementById("result").innerHTML = `
-//     <strong>Total Expenses:</strong> $${totalExpenses}<br>
-//     <strong>Savings:</strong> $${savings}<br>
-//     <strong>Savings %:</strong> ${percentage.toFixed(2)}%<br>
-//     <strong>Advice:</strong> ${message}
-//   `;
-// }
-
-// function calculate() {
-//   const income = getInputValue("income");
-//   const rent = getInputValue("rent");
-//   const food = getInputValue("food");
-//   const transport = getInputValue("transport");
-//   const other = getInputValue("other");
-
-//   const errorMessage = validateInputs(income, rent, food, transport, other);
-
-//   if (errorMessage) {
-//     document.getElementById("error").innerText = errorMessage;
-//     document.getElementById("result").innerHTML = "";
-//     return;
-//   }
-
-//   document.getElementById("error").innerText = "";
-
-//   const totalExpenses = rent + food + transport + other;
-//   const savings = calculateSavings(income, totalExpenses);
-//   const percentage = calculatePercentage(savings, income);
-//   const message = getAdvice(savings, percentage);
-
-//   renderResult(totalExpenses, savings, percentage, message);
-// }
-
-function updateState() {
-  state.inputs.income = getInputValue("income");
+function syncInputsFromDOM() {
+  state.inputs.income = Math.max(0, getInputValue("income")); // income cannot be negative
   state.inputs.rent = getInputValue("rent");
   state.inputs.food = getInputValue("food");
   state.inputs.transport = getInputValue("transport");
   state.inputs.other = getInputValue("other");
-
-  const totalExpenses =
-    state.inputs.rent +
-    state.inputs.food +
-    state.inputs.transport +
-    state.inputs.other;
-
-  const savings = calculateSavings(
-    state.inputs.income,
-    totalExpenses
-  );
-
-  const percentage = calculatePercentage(
-    savings,
-    state.inputs.income
-  );
-  
-  const advice = getAdvice(savings, percentage);
-
-  state.derived.totalExpenses = totalExpenses;
-  state.derived.savings = savings;
-  state.derived.percentage = percentage;
-  state.derived.advice = advice;
 }
 
-function renderResult() {
+// pure
+function validateInputs(inputs) {
+  const errors = {};
+
+  if (inputs.income === 0) {
+    errors.income = "Income cannot be zero.";
+  }
+
+  Object.entries(inputs).forEach(([key, value]) => {
+    if (value < 0) {
+      errors[key] = "Value cannot be negative.";
+    }
+  });
+
+  return {
+    valid: Object.keys(errors).length === 0,
+    errors,
+  };
+}
+
+//pure; logic
+function computeDerived(inputs) {
+  const totalExpenses =
+    inputs.rent + inputs.food + inputs.transport + inputs.other;
+
+  const savings = inputs.income - totalExpenses;
+  const percentage =
+    inputs.income === 0 ? 0 : (savings / inputs.income) * 100;
+
+  let advice = "Good job!";
+  if (savings < 0) advice = "You are overspending!";
+  else if (percentage < 20) advice = "Try to save more.";
+
+  return {
+    totalExpenses,
+    savings,
+    percentage,
+    advice,
+  };
+}
+
+function render() {
+  const resultEl = document.getElementById("result");
+  const errorEl = document.getElementById("errors");
+
+  // Render validation errors
+  if (Object.keys(state.ui.validationErrors).length > 0) {
+    errorEl.innerHTML = Object.values(state.ui.validationErrors)
+      .map((err) => `<div style="color:red;">${err}</div>`)
+      .join("");
+    resultEl.innerHTML = "";
+    return;
+  } else {
+    errorEl.innerHTML = "";
+  }
+
   const d = state.derived;
 
-  document.getElementById("result").innerHTML = `
-    <strong>Total Expenses:</strong> $${d.totalExpenses}<br>
-    <strong>Savings:</strong> $${d.savings}<br>
+  resultEl.innerHTML = `
+    <strong>Total Expenses:</strong> $${d.totalExpenses.toFixed(2)}<br>
+    <strong>Savings:</strong> $${d.savings.toFixed(2)}<br>
     <strong>Savings %:</strong> ${d.percentage.toFixed(2)}%<br>
     <strong>Advice:</strong> ${d.advice}
   `;
 }
 
+//Controller / Orchestrator
 function handleInput() {
-  updateState();
-  renderResult();
+  syncInputsFromDOM();
+
+  const validation = validateInputs(state.inputs);
+  state.ui.validationErrors = validation.errors;
+
+  if (!validation.valid) {
+    render();
+    return;
+  }
+
+  state.derived = computeDerived(state.inputs);
+  render();
 }
 
-["income", "rent", "food", "transport", "other"].forEach(id => {
-  document
-    .getElementById(id)
-    .addEventListener("input", handleInput);
+document.querySelectorAll("input").forEach((input) => {
+  input.addEventListener("input", handleInput);
 });
