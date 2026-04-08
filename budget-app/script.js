@@ -36,10 +36,10 @@ function syncInputsFromDOM() {
 function validateInputs(inputs) {
   const errors = {};
 
-  if (inputs.income === 0) {
-    errors.income = "Income cannot be zero.";
-  } else if (inputs.income < 0) {
+  if (inputs.income < 0) {
     errors.income = "Income cannot be negative.";
+  } else if (inputs.income === 0) {
+    errors.income = "Income cannot be zero.";
   }
 
   Object.entries(inputs).forEach(([key, value]) => {
