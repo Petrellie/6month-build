@@ -25,7 +25,7 @@ function getInputValue(id) {
 }
 
 function syncInputsFromDOM() {
-  state.inputs.income = Math.max(0, getInputValue("income")); // income cannot be negative
+  state.inputs.income = getInputValue("income"); // income cannot be negative
   state.inputs.rent = getInputValue("rent");
   state.inputs.food = getInputValue("food");
   state.inputs.transport = getInputValue("transport");
