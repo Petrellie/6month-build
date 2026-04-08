@@ -77,11 +77,18 @@ function render() {
   const resultEl = document.getElementById("result");
   const errorEl = document.getElementById("errors");
 
+  // Safety check (prevents crash if elements are missing)
+  if (!resultEl || !errorEl) {
+    console.error("Missing #result or #errors element in HTML.");
+    return;
+  }
+
   // Render validation errors
   if (Object.keys(state.ui.validationErrors).length > 0) {
     errorEl.innerHTML = Object.values(state.ui.validationErrors)
       .map((err) => `<div style="color:red;">${err}</div>`)
       .join("");
+
     resultEl.innerHTML = "";
     return;
   } else {
