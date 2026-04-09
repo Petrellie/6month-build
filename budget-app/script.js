@@ -112,6 +112,11 @@ function render() {
   `;
 }
 
+function handleInput() {
+   syncInputsFromDOM();
+   render();
+}
+
 //Controller / Orchestrator
 async function handleSubmit() {
   syncInputsFromDOM();
