@@ -112,12 +112,25 @@ function render() {
   `;
 }
 
+//Controller / Orchestrator
 function handleInput() {
-   syncInputsFromDOM();
-   render();
+  syncInputsFromDOM();
+
+  const validation = validateInputs(state.inputs);
+  state.ui.validationErrors = validation.errors;
+
+  if (validation.valid) {
+    state.derived = computeDerived(state.inputs);
+  }
+
+  render();
 }
 
-//Controller / Orchestrator
+document.querySelectorAll("input").forEach(input => {
+  input.addEventListener("input", handleInput);
+});
+
+
 async function handleSubmit() {
   syncInputsFromDOM();
 
