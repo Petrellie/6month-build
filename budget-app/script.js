@@ -6,24 +6,21 @@ const state = {
     transport: 0,
     other: 0,
   },
-  derived: {
-    totalExpenses: 0,
-    savings: 0,
-    percentage: 0,
-    advice: "",
-  },
   ui: {
+    validationErrors: {},
     loading: false,
     error: null,
-    validationErrors: {},
   },
 };
+
+document.getElementById("submitBtn").addEventListener("click", handleSubmit);
 
 function getInputValue(id) {
   const value = parseFloat(document.getElementById(id).value);
   return isNaN(value) ? 0 : value;
 }
 
+//impure; store
 function syncInputsFromDOM() {
   state.inputs.income = getInputValue("income"); // income cannot be negative
   state.inputs.rent = getInputValue("rent");
@@ -32,7 +29,7 @@ function syncInputsFromDOM() {
   state.inputs.other = getInputValue("other");
 }
 
-// pure
+// pure; evaluates
 function validateInputs(inputs) {
   const errors = {};
 
@@ -54,7 +51,7 @@ function validateInputs(inputs) {
   };
 }
 
-//pure; logic
+//pure; logic; transform
 function computeDerived(inputs) {
   const totalExpenses =
     inputs.rent + inputs.food + inputs.transport + inputs.other;
@@ -75,40 +72,48 @@ function computeDerived(inputs) {
   };
 }
 
+//impure; display
 function render() {
   const resultEl = document.getElementById("result");
   const errorEl = document.getElementById("errors");
+  const loadingEl = document.getElementById("loading");
 
-  // Safety check (prevents crash if elements are missing)
-  if (!resultEl || !errorEl) {
-    console.error("Missing #result or #errors element in HTML.");
-    return;
+  const derived = computeDerived(state.inputs);
+
+  // Loading state
+  if (state.ui.loading) {
+    loadingEl.textContent = "Saving...";
+  } else {
+    loadingEl.textContent = "";
   }
 
-  // Render validation errors
+  // Validation errors
   if (Object.keys(state.ui.validationErrors).length > 0) {
-    errorEl.innerHTML = Object.values(state.ui.validationErrors)
-      .map((err) => `<div style="color:red;">${err}</div>`)
+    errorEl.innerHTML = Object.entries(state.ui.validationErrors)
+      .map(([field, msg]) => `<div style="color:red;"><strong>${field}:</strong> ${msg}</div>`)
       .join("");
-
     resultEl.innerHTML = "";
     return;
   } else {
     errorEl.innerHTML = "";
   }
 
-  const d = state.derived;
+  // Async error
+  if (state.ui.error) {
+    errorEl.innerHTML = `<div style="color:red;">${state.ui.error}</div>`;
+  }
 
+  // Render results
   resultEl.innerHTML = `
-    <strong>Total Expenses:</strong> $${d.totalExpenses.toFixed(2)}<br>
-    <strong>Savings:</strong> $${d.savings.toFixed(2)}<br>
-    <strong>Savings %:</strong> ${d.percentage.toFixed(2)}%<br>
-    <strong>Advice:</strong> ${d.advice}
+    <strong>Total Expenses:</strong> $${derived.totalExpenses.toFixed(2)}<br>
+    <strong>Savings:</strong> $${derived.savings.toFixed(2)}<br>
+    <strong>Savings %:</strong> ${derived.percentage.toFixed(2)}%<br>
+    <strong>Advice:</strong> ${derived.advice}
   `;
 }
 
 //Controller / Orchestrator
-function handleInput() {
+async function handleSubmit() {
   syncInputsFromDOM();
 
   const validation = validateInputs(state.inputs);
@@ -119,10 +124,33 @@ function handleInput() {
     return;
   }
 
-  state.derived = computeDerived(state.inputs);
+  state.ui.loading = true;
+  state.ui.error = null;
   render();
+
+  try {
+    await fakeSaveBudget(state.inputs);
+  } catch (err) {
+    state.ui.error = err.message;
+  } finally {
+    state.ui.loading = false;
+    render();
+  }
 }
 
 document.querySelectorAll("input").forEach((input) => {
   input.addEventListener("input", handleInput);
 });
+
+function fakeSaveBudget(data) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Simulate random failure (20% chance)
+      if (Math.random() < 0.2) {
+        reject(new Error("Failed to save budget. Please try again."));
+      } else {
+        resolve({ status: "success" });
+      }
+    }, 1000);
+  });
+}
